@@ -1,0 +1,232 @@
+/* 01~05 벤토(Showcase.tsx). 토큰·서체는 page.module.css의 .page 변수를 상속받는다. 모서리는 직각. */
+
+.shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  opacity: 0;
+  transition: opacity 480ms ease;
+}
+
+.shotActive {
+  opacity: 1;
+}
+
+.caption {
+  display: grid;
+  gap: 6px;
+}
+
+.name {
+  color: #fff;
+  font-family: var(--font-label);
+  font-size: clamp(13px, 1vw, 16px);
+  letter-spacing: 0.12em;
+}
+
+.line {
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── 벤토: 왼쪽 큰 칸(캡처 + 글자) | 오른쪽 나머지 넷의 캡처만, 위아래 지그재그(2026-09-28 대표 지시) ──
+   캡처는 자르지 않는다(원래 비율). */
+.bento {
+  display: grid;
+  /* 좌우 반반 — 왼쪽(큰 칸)·오른쪽(큐브)이 각자 반의 가운데에 선다(대표 지시: 왼쪽으로 치우쳤다). */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* 헤더 아래에서 시작한다 — padding으로 두면 헤더 뒤로 배경이 띠처럼 비쳤다. */
+  /* 헤더 높이만큼은 바깥 여백이 아니라 안쪽 패딩으로 둔다 — margin이면 앞 섹션과 사이에 검은 띠가 생겼다(대표 지시).
+     배경(Backdrop)은 패딩까지 덮고, 콘텐츠는 헤더 아래에서 시작한다. */
+  box-sizing: border-box;
+  height: 100svh;
+  padding-top: var(--hero-bar-h);
+  position: relative;
+  background: #000;
+}
+
+/* 섹션 배경(Backdrop) 위로 콘텐츠를 올린다. */
+.tileLarge,
+.rail {
+  position: relative;
+  z-index: 1;
+}
+
+/* 큰 칸 — 상하좌우 여백 안에 캡처, 오른쪽에 설명(세로 가운데)·이름·한 줄(아래). 레일과 가르는 선은 없다(대표 지시). */
+.tileLarge {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(16px, 1.6vw, 28px);
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(24px, 5vh, 56px) clamp(24px, 3.4vw, 56px);
+}
+
+/* 큰 칸 글자 자리 — 설명은 세로 가운데, 이름·한 줄은 아래(기존 위치 그대로). */
+.largeText {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-self: stretch;
+}
+
+.desc {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: clamp(180px, 16vw, 260px);
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.7;
+  translate: 0 -50%;
+}
+
+.tileLarge .caption {
+  width: clamp(180px, 16vw, 260px);
+}
+
+.tileMedia {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 1206 / 2622;
+  overflow: hidden;
+}
+
+/* 레일 =캡처 크기에 딱 맞춘 4×2 칸(8칸). 캡처 넷이 위·아래·위·아래로 한 칸씩 엇갈려 앉는다(큐브, 대표 지시).
+   칸 = 섹션 높이의 약 1/3 높이 × 캡처 비율 폭. 선은 없다(대표 지시) — 빈 칸 넷이 검정으로 체크무늬를 만든다. */
+.rail {
+  --cell-h: calc((100svh - var(--hero-bar-h)) * 0.34);
+  --cell-w: calc(var(--cell-h) * 1206 / 2622);
+  display: grid;
+  grid-template-columns: repeat(4, var(--cell-w));
+  grid-template-rows: repeat(2, var(--cell-h));
+  align-content: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.railItem {
+  position: relative;
+  z-index: 1;
+  grid-row: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: scale 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.railItem:nth-child(1) {
+  grid-column: 1;
+}
+
+.railItem:nth-child(2) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.railItem:nth-child(3) {
+  grid-column: 3;
+}
+
+.railItem:nth-child(4) {
+  grid-column: 4;
+  grid-row: 2;
+}
+
+.railItem .tileMedia {
+  width: 100%;
+  height: 100%;
+}
+
+/* 캡처 이름(영문만) — 위 칸 캡처는 위쪽 바깥에, 아래 칸 캡처는 아래쪽 바깥에 붙는다.
+   가운데 줄에 두면 이름 넷이 한 줄에 몰려 모바일에서 겹쳤다. */
+.railLabel {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  width: max-content;
+  max-width: calc(var(--cell-w) * 1.6);
+  color: #fff;
+  font-family: var(--font-label);
+  font-size: clamp(11px, 0.8vw, 13px);
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-align: left;
+  transition: color 320ms ease;
+}
+
+.railItem:nth-child(even) .railLabel {
+  top: calc(100% + 12px);
+  bottom: auto;
+}
+
+.railItem:hover .railLabel,
+.railItem:focus-visible .railLabel {
+  color: var(--blush-ink);
+}
+
+.railItem:hover,
+.railItem:focus-visible {
+  scale: 1.04;
+}
+
+.railItem:focus-visible {
+  outline: 2px solid var(--blush-ink);
+  outline-offset: 4px;
+}
+
+/* 자리 이동(View Transition) — 부드럽게 미끄러진다. */
+::view-transition-group(*) {
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 모바일: 한 화면 안에 큰 칸이 위, 레일(캡처 넷 지그재그)이 아래. */
+@media (max-width: 720px) {
+  .bento {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1.35fr 1fr;
+  }
+  .tileLarge {
+    padding: var(--gap-s);
+  }
+  .largeText {
+    flex: 1;
+    min-width: 0;
+  }
+  .tileLarge .caption,
+  .desc {
+    width: 100%;
+  }
+  .desc {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  /* 모바일 레일 = 화면 아래 약 40% 행 — 칸 높이를 그 행 기준으로 다시 잡는다. */
+  .rail {
+    --cell-h: calc((100svh - var(--hero-bar-h)) * 0.17);
+  }
+  .name {
+    font-size: 11px;
+  }
+  .line {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot,
+  .railItem {
+    transition: none;
+  }
+}

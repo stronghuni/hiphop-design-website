@@ -1,0 +1,825 @@
+@font-face {
+  font-family: "Pretendard Landing";
+  src: url("/fonts/pretendard/Pretendard-Landing-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard Landing";
+  src: url("/fonts/pretendard/Pretendard-Landing-SemiBold.otf") format("opentype");
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Anton Landing";
+  src: url("/fonts/anton/Anton-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap; /* SIL OFL 1.1 */
+}
+
+/*
+ * 공개 랜딩(2026-09-28 Brut·HAUS STUDIO 재설계). 규칙 = docs/design/LANDING_GESTALT.md §1.
+ * 검정 한 장 + 흰 글자 + 강조색 핑크 하나. 채운 면(알약·카드)은 없다 — 버튼도 글자와 밑줄뿐이다.
+ * 모서리는 전부 직각(폰 프레임은 실물 기기 모양이라 예외).
+ */
+.page {
+  position: relative;
+  --paper: #000;
+  --ink: #fff;
+  --ink-soft: rgba(255, 255, 255, 0.72);
+  --ink-mute: rgba(255, 255, 255, 0.4);
+  --blush-ink: #f2bcc8; /* 강조색 하나 — 핑크 글자·진행선·밑줄 */
+  --hair: rgba(255, 255, 255, 0.18);
+  --label-ink: rgba(255, 255, 255, 0.6);
+  --hero-bar-h: 64px;
+  /* 파티 사진 창 — 워드마크와 모드 링크(호버)가 같이 쓴다. 와인색을 screen으로 섞어 사진의 검정을 들어 올린다. */
+  --party-fill: linear-gradient(#5a1f3a, #5a1f3a), url("/hero-party.webp") center 35% / cover no-repeat;
+
+  /* 서체 2역할(2026-09-28): 영문 라벨·숫자·워드마크 = Anton, 한국어 전부(제목·본문·버튼) = Pretendard.
+     제목과 본문은 굵기로만 가른다 — 손글씨 Dongdong은 쓰지 않는다(대표 지시). */
+  --font-label: "Anton Landing", Impact, sans-serif;
+  --font-body: "Pretendard Landing", "Apple SD Gothic Neo", sans-serif;
+  --font-title: var(--font-body);
+  --edge: clamp(20px, 5vw, 56px);
+  --content: 1040px;
+  --gap-xs: 8px;
+  --gap-s: 16px;
+  --gap-m: 24px;
+  --gap-l: 40px;
+  --gap-section: clamp(96px, 14vh, 160px);
+
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  /* 한국어는 단어 중간에서 끊지 않는다. */
+  word-break: keep-all;
+  /* hidden은 스크롤 컨테이너를 만들어 sticky를 죽인다 — clip은 가로 넘침만 자른다. */
+  overflow-x: clip;
+  color-scheme: dark;
+}
+
+/* 필름 그레인 한 겹 — 이미지 요청 없이 SVG 노이즈. */
+.page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+}
+
+.page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* MUI CssBaseline이 h1~h6에 element 규칙으로 폰트를 박는다 — 클래스+엘리먼트로 되찾는다. */
+.page h1,
+.page h2 {
+  font-family: var(--font-body);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── 텍스트 버튼 — 알약·화살표 없이 글자 + 밑줄만(2026-09-28 대표 지시) ─────────────
+ * 기본 밑줄 40%가 깔려 있고, 올리면 꽉 찬 선이 왼쪽에서 오른쪽으로 덮는다.
+ * 누르는 영역은 44px 높이를 지킨다. primary는 핑크 글자 — 페이지에서 핑크 글자는 이것뿐이다. */
+.textButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.textButton::before,
+.textButton::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 9px;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+}
+
+.textButton::before {
+  opacity: 0.4;
+}
+
+.textButton::after {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.textButton:hover::after,
+.textButton:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.textButton:focus-visible {
+  outline: 2px solid var(--blush-ink);
+  outline-offset: 4px;
+}
+
+.textButton:active {
+  opacity: 0.7;
+}
+
+.textButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.textButtonPrimary {
+  color: var(--blush-ink);
+}
+
+/* ── 헤더 — 유일한 고정 레이어 ───────────────────────── */
+.siteHeader {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.launchBar {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  height: clamp(64px, 8vh, 84px);
+  padding: 0 var(--edge);
+  /* 불투명 검정 + 아래 가는 선 — 반투명이면 밝은 캡처 위에서 헤더 글자가 묻혔다(2026-09-28 모바일 지적). */
+  background: #000;
+  border-bottom: 1px solid var(--hair);
+}
+
+.barMark {
+  justify-self: start;
+  color: #fff;
+  font-family: var(--font-label);
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.barMark:focus-visible {
+  outline: 2px solid var(--blush-ink);
+  outline-offset: 3px;
+}
+
+.barClock {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.barClock b {
+  margin: 0 0.15em;
+  color: #fff;
+  font-family: var(--font-label);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.barNav {
+  justify-self: end;
+  display: flex;
+  gap: var(--gap-m);
+}
+
+/* 좁은 화면: 데스크톱과 같은 구성(MINGLES · D-day 시계 · 사전 예약 · 문의)을 글자만 줄여 한 줄에 둔다
+   (2026-09-28 대표 지시 — 시·분·초와 문의를 숨겼더니 디데이도 문의도 안 보였다). 360px 폭까지 한 줄. */
+@media (max-width: 720px) {
+  .launchBar {
+    gap: var(--gap-xs);
+    padding: 0 var(--gap-s);
+  }
+  .barMark {
+    font-size: 17px;
+  }
+  .barClock {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .barClock b {
+    margin: 0 0.1em;
+    font-size: 16px;
+  }
+  .barNav {
+    gap: var(--gap-s);
+  }
+  .barNav .textButton {
+    font-size: 13px;
+  }
+}
+
+/* ── 히어로(Brut·HAUS 12열) ─────────────────────────────
+ * 좌 3열 로테이션 · 우 3열 테이블 → 가는 선 → 화면 폭 워드마크(아랫단이 잘린다).
+ * 높이는 담긴 것만큼이다 — 가운데를 비워 두지 않는다(2026-09-28 대표 지시로 가운데 폰 제거). */
+.hero {
+  /* 워드마크 = 폭을 채운다(잉크 약 3.16em). 낮은 화면에선 헤더·모드 줄을 뺀 높이로 한 번 더 막는다. */
+  --word: min(calc(100cqw / 3.16), calc((100svh - var(--hero-bar-h) - 160px) * 1.1));
+  container-type: inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--hero-bar-h) var(--edge) 0;
+}
+
+/* 장면 목차 한 줄 — 작은 글자, 좌우를 넉넉히 비우고 같은 간격으로 흩어 둔다. */
+.heroGrid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-m);
+  padding: 0 clamp(24px, 8vw, 160px);
+  /* 스크롤하면 목차가 먼저 빠지고 워드마크가 남는다. */
+  opacity: clamp(0, 1 - var(--p, 0) * 1.6, 1);
+}
+
+/* 히어로 = 한 화면(모바일 포함 — 섹션마다 한 화면씩 끊어 보인다, 2026-09-28 대표 지시).
+   워드마크는 바닥(아랫단 잘림), 목차는 헤더와 워드마크 사이의 세로 가운데. */
+.hero {
+  min-height: min(100svh, 900px);
+}
+
+.heroGrid {
+  flex: 1;
+}
+
+/* 목차 링크 — 모두 같은 무게, 누르면 그 장면으로 내려간다. */
+.modeBlock {
+  color: #fff;
+  font-family: var(--font-label);
+  font-size: clamp(11px, 0.95vw, 15px);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 320ms ease;
+}
+
+/* 올리면 워드마크처럼 글자에 파티 사진이 비친다 — 사진은 늘 깔려 있고 흰 글자가 투명해지며 드러난다. */
+.modeBlock {
+  background: var(--party-fill);
+  background-blend-mode: screen, normal;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.modeBlock:hover,
+.modeBlock:focus-visible {
+  color: transparent;
+}
+
+.modeBlock:focus-visible {
+  outline: 2px solid var(--blush-ink);
+  outline-offset: 6px;
+}
+
+/* 데스크톱: 글자 아랫단 약 1/6을 히어로 밖으로 — 히어로 밑변이 글자를 자른다(overflow: hidden).
+   모바일: 자르지 않는다(대표 지시 2026-09-28). */
+.brandBlock {
+  margin-bottom: calc(var(--word) * -0.16);
+}
+
+@media (max-width: 720px) {
+  /* 모바일: 자르지 않되 화면 밑변에 붙인다(여백 없음, 대표 지시). */
+  .brandBlock {
+    margin-bottom: 0;
+  }
+}
+
+/* 워드마크 — 컨테이너가 0→100%로 열리고(애니메이션) 글자가 차례로 선다. */
+.brand {
+  display: flex;
+  width: 0;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--word);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.page h1.brand {
+  font-family: var(--font-label);
+}
+
+.page[data-hero-intro="complete"] .brand {
+  width: 100%;
+}
+
+/* 글자 = 파티 조명이 비치는 창(2026-09-28 대표 지시). 글자 밖은 검정 그대로다(히어로엔 배경 층이 없다).
+ * 사진은 워드마크 상자 하나에 깔고 글자 모양으로만 오려 낸다(background-clip: text — 글자 span은 투명).
+ * 사진 = Unsplash 2mHKUs_v6do(Isaiah McCarty, Unsplash License — 출처 표기 의무 없음). 사진이 어두워
+ * 와인색을 screen으로 섞어 어두운 부분도 글자 윤곽이 읽히게 한다. */
+.brandWord {
+  display: flex;
+  flex: 0 0 100%;
+  justify-content: center;
+  background: var(--party-fill);
+  background-blend-mode: screen, normal;
+  -webkit-background-clip: text;
+  background-clip: text;
+  translate: var(--word-x, 0) var(--word-y, 0);
+}
+
+.brandLetter {
+  display: inline-block;
+  color: #fff;
+  opacity: var(--letter-opacity, 0);
+  translate: 0 var(--letter-y, 38%);
+  rotate: var(--letter-rotate, 2deg);
+  filter: blur(var(--letter-blur, 8px));
+  transition: color 700ms ease;
+}
+
+/* 모바일 워드마크 = 한 줄 그대로 세로로 늘린다(대표 지시 2026-09-28 — 두 줄 MING / LES 대신).
+ * 한 줄이면 폭에 막혀 글자가 화면 높이의 1/8이다. 배율 --stretch는 page.tsx measureBar가 화면 높이의 45%가 되게 잰다.
+ * 늘리는 건 .brand 전체(transform) — 사진도 같이 늘어나므로 배경 높이를 1/배율로 미리 줄여 원래 비율로 보이게 한다
+ * (사진 3:2 → 늘린 뒤 보이는 높이 H에 맞는 폭 = H × 1.503). 늘어난 만큼의 자리는 .brandBlock 높이가 잡는다. */
+@media (max-width: 720px) {
+  .brandBlock {
+    height: calc(var(--word) * 0.96 * var(--stretch, 1));
+    box-sizing: content-box;
+  }
+  .brand {
+    transform: scaleY(var(--stretch, 1));
+    transform-origin: top;
+  }
+  .brandWord {
+    background-size:
+      100% 100%,
+      max(100%, calc(var(--word) * 0.96 * var(--stretch, 1) * 1.503)) 100%;
+    background-position: center;
+  }
+}
+
+/* 진입이 끝나면 조명이 켜진다 — 흰 글자가 투명해지며 뒤의 파티 조명이 비친다.
+ * 효과 속성(opacity·translate·rotate·filter)을 모두 걷어야 한다: 하나라도 남으면 글자가 따로 그려져
+ * 부모의 background-clip: text에 잡히지 않고 글자가 통째로 사라진다(실측). */
+.page[data-hero-intro="complete"] .brandLetter {
+  color: transparent;
+  opacity: 1;
+  translate: none;
+  rotate: none;
+  filter: none;
+}
+
+/* 좁은 화면: 한 줄에 다 안 들어간다 — 가운데 정렬로 줄바꿈하되 순서는 그대로. */
+@media (max-width: 720px) {
+  .heroGrid {
+    flex-wrap: wrap;
+    /* 두 줄이 히어로 높이만큼 벌어지지 않게 가운데로 모은다. */
+    align-content: center;
+    justify-content: center;
+    gap: var(--gap-s) var(--gap-m);
+    padding: var(--gap-l) var(--gap-s);
+  }
+}
+
+/* ── sticky 장면 공통 — 앞 장면 퇴장 구간과 100vh 겹친다(교대 곡선은 page.tsx) ───── */
+.featureStage {
+  --stage-p: 0;
+  position: relative;
+  min-height: 260vh;
+}
+
+/* 포맷 — 숫자 넷이 차례로 서는 구간. ⚠️ page.tsx가 이 클래스로 장면을 찾는다 — 규칙이 없으면
+   CSS 모듈이 이름을 내보내지 않아 조용히 undefined가 된다. */
+.formatStage {
+  /* 숫자 여덟 개(두 줄)가 차례로 선다 — 장당 약 1/3 화면. */
+  min-height: 340vh;
+}
+
+.featureSticky {
+  position: sticky;
+  top: 0;
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+  padding: calc(var(--hero-bar-h) + var(--gap-m)) var(--edge) var(--gap-l);
+}
+
+/* 전환 = opacity + translateY 28px만(블러·스케일 금지 — 멈춘 화면에 흐린 글씨가 남았다). */
+.formatPanel {
+  opacity: var(--stage-p);
+  transform: translateY(calc((1 - var(--stage-p)) * 28px));
+  will-change: opacity, transform;
+}
+
+.featureKicker {
+  display: inline-block;
+  color: var(--label-ink);
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+
+/* ── 포맷 — 위 절반 로테이션(왼쪽부터), 아래 절반 테이블(오른쪽부터). HAUS의 계단 숫자 ───────────── */
+.formatPanel {
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  row-gap: var(--gap-l);
+  width: 100%;
+}
+
+/* 각 절반 = 12열. 제목 3열 + 숫자 9열, 줄 안에서 세로 가운데. */
+.formatRow {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap-m);
+  align-content: center;
+  align-items: end;
+}
+
+.formatTitle {
+  grid-column: 1 / span 3;
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(20px, 2vw, 30px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+}
+
+.page .formatTitle {
+  font-family: var(--font-label);
+}
+
+.formatFacts {
+  grid-column: 4 / -1;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--gap-m);
+  align-items: end;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 아래 절반은 거울상 — 제목이 오른쪽, 숫자는 오른쪽에서 왼쪽으로 커진다. */
+.formatRowReverse .formatTitle {
+  grid-column: 10 / -1;
+  text-align: right;
+}
+
+.formatRowReverse .formatFacts {
+  grid-column: 1 / span 9;
+  direction: rtl;
+}
+
+.formatRowReverse .formatFacts li {
+  direction: ltr;
+  justify-items: end;
+  text-align: right;
+}
+
+.formatRowReverse .factValue {
+  justify-content: flex-end;
+}
+
+/* 줄 안에서 한 칸씩 커지는 계단(--step) — 여덟 개가 위→아래 순서로 선다(--i, --facts 0→8). */
+.formatFacts li {
+  --size: calc(clamp(48px, 5.4vw, 80px) * (1 + var(--step) * 0.42));
+  --show: clamp(0, var(--facts, 0) - var(--i), 1);
+  display: grid;
+  gap: var(--gap-xs);
+  border-top: 1px solid var(--hair);
+  padding-top: var(--gap-s);
+  opacity: var(--show);
+  transform: translateY(calc((1 - var(--show)) * 40px));
+}
+
+.factValue {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: #fff;
+  font-family: var(--font-label);
+  /* 두 줄이 한 화면에 들어가야 한다 — 높이로도 막는다. */
+  font-size: min(var(--size), 14vh);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.factValue small {
+  padding-top: 0.2em;
+  color: var(--label-ink);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+
+.factLabel {
+  max-width: 18ch;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .formatPanel {
+    row-gap: var(--gap-m);
+  }
+  .formatRow {
+    grid-template-columns: 1fr;
+    row-gap: var(--gap-s);
+    align-content: center;
+  }
+  .formatTitle,
+  .formatFacts,
+  .formatRowReverse .formatTitle,
+  .formatRowReverse .formatFacts {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .formatFacts {
+    grid-template-columns: 1fr 1fr;
+    row-gap: var(--gap-s);
+  }
+  .formatFacts li {
+    --size: 40px;
+    padding-top: var(--gap-xs);
+  }
+  .factLabel {
+    font-size: 12px;
+  }
+}
+
+/* ── 사전 예약 — 페이지의 마지막 장면. 히어로 워드마크와 같은 크기의 날짜로 닫는다 ───── */
+.preRegister {
+  container-type: inline-size;
+  border-top: 1px solid var(--hair);
+  padding: var(--gap-l) var(--edge) var(--gap-section);
+}
+
+.preInner {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap-m);
+  row-gap: var(--gap-l);
+  align-items: end;
+}
+
+/* 히어로 워드마크와 같은 파티 사진 창 — 글자 안에만 사진이 비친다(글자 밖은 검정). */
+/* 11.09 = 손 그림자 하트 사진이 글자 안에만 비친다(2026-09-28 대표 지시 — 섹션 전체 배경이 아니라 글자 크기에 맞춘다).
+   상자를 글자 폭(max-content)으로 줄이고 사진을 그 상자에 cover로 맞춘 뒤 글자 모양으로 오려 낸다. */
+.preDate {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: max-content;
+  margin: 0;
+  color: transparent;
+  background: url("/bg-heart-wall.webp") center / cover no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: var(--font-label);
+  /* "1109" 잉크 폭 약 1.9em(대표 지시로 점을 뺐다) — 히어로 워드마크처럼 폭을 채운다. */
+  font-size: min(calc(100cqw / 2.25), 44vh);
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.preCopy {
+  grid-column: 1 / span 5;
+}
+
+.preCopy h2 {
+  margin: var(--gap-xs) 0 var(--gap-s);
+  color: #fff;
+  font-family: var(--font-title);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.preCopy p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 폼 = 밑줄 입력 + 텍스트 버튼(면 없음). */
+.preForm,
+.ticket {
+  grid-column: 7 / -1;
+}
+
+.preForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--gap-m);
+}
+
+.preInput {
+  flex: 1 1 240px;
+  min-height: 56px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 18px;
+}
+
+.preInput::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.preInput:focus-visible {
+  outline: none;
+  border-bottom-color: var(--blush-ink);
+}
+
+.preForm .textButton {
+  min-height: 56px;
+}
+
+.preForm .textButton::before,
+.preForm .textButton::after {
+  bottom: 0;
+}
+
+.preError {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--blush-ink);
+  font-size: 16px;
+}
+
+.storeLinks {
+  grid-column: 7 / -1;
+  display: flex;
+  gap: var(--gap-l);
+}
+
+/* 완료 티켓 — 직각, 절취선 하나. */
+.ticket {
+  display: flex;
+  border: 1px solid var(--blush-ink);
+}
+
+.ticketStub {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 14px;
+  border-right: 1px dashed var(--blush-ink);
+  writing-mode: vertical-rl;
+  color: var(--blush-ink);
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+}
+
+.ticketBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--gap-xs);
+  padding: var(--gap-m);
+}
+
+.ticketKicker {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ticketCode {
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ticketBody small {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .preInner {
+    grid-template-columns: 1fr;
+  }
+  .preCopy,
+  .preForm,
+  .ticket,
+  .storeLinks {
+    grid-column: 1;
+  }
+}
+
+/* ── 푸터 ─────────────────────────────────────────── */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--gap-m);
+  border-top: 1px solid var(--hair);
+  padding: 32px var(--edge) 56px;
+  font-size: 13px;
+}
+
+.footer > span:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--gap-m);
+}
+
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.footer a:hover,
+.footer a:focus-visible {
+  color: var(--ink);
+}
+
+.footer a:focus-visible {
+  outline: 2px solid var(--blush-ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .formatPanel,
+  .formatFacts li {
+    transform: none;
+  }
+  .textButton::after,
+  .modeBlock {
+    transition: none;
+  }
+}
+
+/* 섹션 배경(Backdrop) 위로 콘텐츠를 올린다. */
+.hero > nav,
+.brandBlock,
+.featureSticky > .formatPanel,
+.preInner {
+  position: relative;
+  z-index: 1;
+}
+
+.preRegister {
+  position: relative;
+}

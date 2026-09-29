@@ -1,0 +1,32 @@
+/* 섹션 배경(Backdrop.tsx) — 사진 + 스포트라이트가 뚫린 검정 면. 섹션 콘텐츠는 이 층 위(z-index 1)에 선다.
+   캔버스가 처음 그려지기 전(첫 페인트·JS 없음)에는 사진을 감춘다 — 검정 섹션으로 보인다. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.backdrop:not([data-ready]) .photo {
+  opacity: 0;
+}
+
+/* 사진 위 screen 합성 — 검정은 이 색이 되고 밝은 조명은 그대로다(히어로 워드마크 창에 쓰던 방식). */
+.lift {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
