@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
-import path from "node:path";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  outputFileTracingRoot: path.resolve(__dirname, "../.."),
   async headers() {
     const scriptSrc = process.env.NODE_ENV === "production"
       ? "script-src 'self' 'unsafe-inline'"
@@ -20,15 +17,6 @@ const nextConfig: NextConfig = {
       securityHeaders.push({ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" });
     }
     return [{ source: "/(.*)", headers: securityHeaders }];
-  },
-  async rewrites() {
-    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:3000";
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${backendUrl}/:path*`,
-      },
-    ];
   },
 };
 

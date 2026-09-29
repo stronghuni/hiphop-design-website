@@ -83,7 +83,6 @@ function LaunchCountdown() {
         <TextLink href="#pre-register" primary>
           사전 예약
         </TextLink>
-        <TextLink href="/support">문의</TextLink>
       </div>
     </div>
   );
@@ -508,11 +507,6 @@ export default function Home() {
 
       <footer className={styles.footer}>
         <span>© {new Date().getFullYear()} MINGLES</span>
-        <span>
-          <a href="/terms">이용약관</a>
-          <a href="/privacy">개인정보처리방침</a>
-          <a href="/account-deletion">회원탈퇴 안내</a>
-        </span>
       </footer>
     </div>
   );

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo_Black } from "next/font/google";
-import ThemeProvider from "@/components/providers/ThemeProvider";
+import "./globals.css";
 
 /** 히어로 워드마크 전용 각진 디스플레이 서체. 본문 명조와 섞지 않는다. */
 const display = Archivo_Black({
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className={display.variable}>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        {children}
       </body>
     </html>
   );

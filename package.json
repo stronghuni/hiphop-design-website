@@ -1,5 +1,5 @@
 {
-  "name": "@mingle/web",
+  "name": "hiphop-design-website",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -9,17 +9,9 @@
     "dev": "next dev -p 3100",
     "build": "next build",
     "start": "next start -p 3100",
-    "lint": "eslint . --max-warnings=0",
-    "test": "vitest run"
+    "lint": "eslint . --max-warnings=0"
   },
   "dependencies": {
-    "@mingle/shared": "workspace:*",
-    "@emotion/cache": "^11.13.0",
-    "@emotion/react": "^11.13.0",
-    "@emotion/server": "^11.11.0",
-    "@emotion/styled": "^11.13.0",
-    "@mui/material": "7.3.10",
-    "@mui/material-nextjs": "7.3.10",
     "animejs": "^4.5.0",
     "next": "16.3.4",
     "react": "^19.0.0",
@@ -31,12 +23,6 @@
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.3.4",
-    "typescript": "^5.7.0",
-    "vitest": "^2.1.9"
-  },
-  "knip": {
-    "ignoreDependencies": [
-      "eslint-config-next"
-    ]
+    "typescript": "^5.7.0"
   }
 }
